@@ -17,3 +17,16 @@
 ## 3. Start RL Training
 
     python rl_training.py
+
+
+
+## Key Features
+End-to-End Multimodal Processing: Handles both text and audio inputs/outputs
+
+Language Agnostic: Supports 22 Indian languages + English
+
+Efficient Resource Management: NVMe offloading via DeepSpeed Zero-3
+
+Reinforcement Learning: Customizable reward mechanism for Llama-8B
+
+Production-Ready: Modular architecture with proper error handling
