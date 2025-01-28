@@ -1,1 +1,16 @@
-
+models:
+  whisper:
+    name: "openai/whisper-large-v3-turbo"
+    type: "audio-to-text"
+  
+  indic_trans:
+    name: "ai4bharat/indictrans2-indic-indic-1B"
+    type: "translator"
+  
+  llama:
+    name: "meta-llama/Llama-3.1-8B-Instruct"
+    type: "main-model"
+  
+  tts:
+    name: "ai4bharat/indic-parler-tts-pretrained"
+    type: "text-to-speech"
