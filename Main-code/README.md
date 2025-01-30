@@ -6,6 +6,7 @@ To implement your **Multilingual AI Chatbot** with **DeepSpeed NVMe offloading**
 
 ```
 📂 multilingual-chatbot  
+│── 📂 model
 │── 📂 models/                  # Model loading & DeepSpeed optimization  
 │   ├── asr.py                  # Audio-to-Text (Whisper ASR)  
 │   ├── translation.py           # Text-to-Text translation (IndicTrans2)  
