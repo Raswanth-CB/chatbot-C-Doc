@@ -1,3 +1,6 @@
+To implement your **Multilingual AI Chatbot** with **DeepSpeed NVMe offloading**, you need the following **pipeline structure**:  
+
+
 ---
 ## **📂 Project Structure**  
 
