@@ -101,9 +101,9 @@ To implement your **Multilingual AI Chatbot** with **DeepSpeed NVMe offloading**
 ---
 ---
 ## **Model path**
-models/asr.py   ---  Whisper
-models/translation.py --- IndicTrans2
-models/tts.py --- Indic-Parler-TTS
-models/llama.py --- LLaMA Model
+    models/asr.py   ---  Whisper
+    models/translation.py --- IndicTrans2
+    models/tts.py --- Indic-Parler-TTS
+    models/llama.py --- LLaMA Model
 
 ---
