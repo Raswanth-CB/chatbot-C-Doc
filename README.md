@@ -47,3 +47,21 @@ Complete project work flow
     │       └→ Speech Audio File
     │
     [End]
+
+
+```mermaid
+graph TD
+    A[Input] --> B{Type?}
+    B --> |Audio| C[ASR: Whisper]
+    B --> |Text| D[Language Detection]
+    C --> D
+    D --> E{English?}
+    E --> |No| F[Translate to English]
+    E --> |Yes| G[LLaMA Processing]
+    F --> G
+    G --> H{Output Language?}
+    H --> |Non-English| I[Back-Translate]
+    H --> |English| J[Direct Output]
+    I --> K[TTS: Indic-Parler]
+    J --> K
+    K --> L[Output]
