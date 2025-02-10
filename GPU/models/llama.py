@@ -1,43 +1,31 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import deepspeed
+# multilingual_chatbot/models/llama.py
+
+from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
 class LlamaModel:
-    def __init__(self, deepspeed_config):
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-3.1-8B-Instruct")
+    def __init__(self):
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
+        # Load model and tokenizer (replace with your preferred model)
+        model_name = "huggyllama/llama-7b"  # Use your preferred variant
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForCausalLM.from_pretrained(
-            "meta-llama/Llama-3.1-8B-Instruct",
-            torch_dtype=torch.bfloat16,
-            device_map="auto",
-            offload_folder="offload"
-        )
-        
-        # Initialize DeepSpeed
-        self.ds_engine = deepspeed.init_inference(
-            self.model,
-            config=deepspeed_config,
-            dtype=torch.bfloat16,
-            replace_method="auto"
-        )
-    
-    def generate_response(self, prompt, max_length=512):
-        inputs = self.tokenizer(
-            prompt, 
-            return_tensors="pt", 
-            padding=True
+            model_name,
+            torch_dtype=torch.float16,
+            device_map="auto"
         ).to(self.device)
+
+    def generate_response(self, prompt, max_length=200):
+        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
         
-        outputs = self.ds_engine.module.generate(
-            **inputs,
-            max_length=max_length,
-            temperature=0.7,
-            top_p=0.9,
-            do_sample=True
-        )
+        with torch.no_grad():
+            outputs = self.model.generate(
+                inputs.input_ids,
+                max_length=max_length,
+                temperature=0.7,
+                top_p=0.9,
+                do_sample=True
+            )
         
-        return self.tokenizer.decode(
-            outputs[0], 
-            skip_special_tokens=True
-        )
+        return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
