@@ -1,10 +1,8 @@
-# multilingual_chatbot/utils/language_detect.py
-from langdetect import detect, DetectorFactory
-
-DetectorFactory.seed = 0
+from langdetect import detect
 
 def detect_language(text):
     try:
-        return detect(text)
+        lang = detect(text)
+        return lang
     except:
-        return "en"
+        return 'en'
