@@ -11,9 +11,9 @@ from utils.config import get_language_code
 
 class MultilingualChatbot:
     def __init__(self):
-        # Initialize models with GPU support
+        # GPU setup
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        
+
         # Initialize models
         self.asr_model = WhisperASR().to(self.device)
         self.translator = IndicTranslator()
@@ -23,14 +23,8 @@ class MultilingualChatbot:
         # Conversation history
         self.conversation_history = []
 
-    def process_input(
-        self,
-        input_data,
-        input_type="text",
-        input_language=None,
-        output_type="text",
-        output_language=None
-    ):
+    def process_input(self, input_data, input_type="text", input_language=None, output_type="text", output_language=None):
+        # Step 1: Process audio input
         if input_type == "audio":
             print("Processing audio input...")
             text = self.asr_model.transcribe(input_data, source_lang=input_language)
@@ -38,34 +32,31 @@ class MultilingualChatbot:
             print("Processing text input...")
             text = input_data
 
-        # Language detection
+        # Step 2: Language detection
         src_lang = input_language or detect_language(text)
         src_lang = get_language_code(src_lang)
         print(f"Source language: {src_lang}")
         output_lang = output_language or src_lang
 
-        # Translation to English
+        # Step 3: Translation to English (if needed)
         if src_lang != "en":
             english_text = self.translator.translate(text, src_lang, "en")
         else:
             english_text = text
 
-        # LLM Response
+        # Step 4: Generate response
         prompt = self._prepare_prompt(english_text)
         english_response = self.llama_model.generate_response(prompt)
 
-        # Translate back if needed
+        # Step 5: Reverse Translation (if needed)
         if output_lang != "en":
             final_text = self.translator.translate(english_response, "en", output_lang)
         else:
             final_text = english_response
 
-        self.conversation_history.append({
-            "user": text,
-            "assistant": final_text
-        })
+        self.conversation_history.append({"user": text, "assistant": final_text})
 
-        # Generate output
+        # Step 6: Output processing
         if output_type == "audio":
             audio_data = self.tts_model.synthesize(final_text, output_lang)
             return audio_data
@@ -83,14 +74,9 @@ class MultilingualChatbot:
 
 def main():
     chatbot = MultilingualChatbot()
-    
-    # Example text input
+
     user_text = input("Enter your message: ")
-    response = chatbot.process_input(
-        input_data=user_text,
-        input_type="text",
-        output_type="text"
-    )
+    response = chatbot.process_input(input_data=user_text, input_type="text", output_type="text")
     print("\nResponse:", response)
 
 if __name__ == "__main__":
