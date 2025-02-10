@@ -1,0 +1,10 @@
+# requirements.txt (updated)
+torch>=2.0.0
+transformers>=4.40.0
+deepspeed>=0.14.0
+fasttext-wheel
+soundfile
+datasets
+accelerate
+bitsandbytes
+scipy
