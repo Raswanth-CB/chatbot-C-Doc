@@ -1,23 +1,22 @@
 import torch
-from transformers import VitsModel, AutoTokenizer
+from transformers import AutoModel, AutoTokenizer
 
 class IndicTTS:
     def __init__(self):
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.models = {
-            'en': (VitsModel.from_pretrained("facebook/mms-tts-eng"), AutoTokenizer.from_pretrained("facebook/mms-tts-eng")),
-            'hi': (VitsModel.from_pretrained("facebook/mms-tts-hin"), AutoTokenizer.from_pretrained("facebook/mms-tts-hin")),
-            'ta': (VitsModel.from_pretrained("facebook/mms-tts-tam"), AutoTokenizer.from_pretrained("facebook/mms-tts-tam"))
-        }
+        # self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        if not torch.cuda.is_available():
+            raise RuntimeError("CUDA-enabled GPU is required but not available")
+        self.model = AutoModel.from_pretrained("model/indic-parler-tts-pretrained").to(self.device)
+        self.tokenizer = AutoTokenizer.from_pretrained("model/indic-parler-tts-pretrained")
         
     def synthesize(self, text, language):
-        if language not in self.models:
-            language = 'en'
-            
-        model, tokenizer = self.models[language]
-        model = model.to(self.device)
-        inputs = tokenizer(text, return_tensors="pt").to(self.device)
+        # Set language code based on config mapping (ensure language codes match the model's requirements)
+        inputs = self.tokenizer(
+            text=text,
+            language=language,
+            return_tensors="pt"
+        ).to(self.device)
         
         with torch.no_grad():
-            output = model(**inputs).waveform
+            output = self.model(**inputs).waveform
         return output.cpu().numpy().squeeze()

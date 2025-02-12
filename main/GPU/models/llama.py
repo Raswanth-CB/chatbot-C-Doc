@@ -1,20 +1,29 @@
 # multilingual_chatbot/models/llama.py
-
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 import torch
 
 class LlamaModel:
     def __init__(self):
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        if not torch.cuda.is_available():
+            raise RuntimeError("CUDA-enabled GPU is required but not available")
+            
+        self.device = torch.device("cuda")
         
-        # Load model and tokenizer (replace with your preferred model)
-        model_name = "huggyllama/llama-7b"  # Use your preferred variant
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        # 4-bit quantization configuration
+        bnb_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_use_double_quant=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=torch.float16
+        )
+        
+        self.tokenizer = AutoTokenizer.from_pretrained("model/Llama-3.1-8B")
         self.model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            torch_dtype=torch.float16,
-            device_map="auto"
-        ).to(self.device)
+            "model/Llama-3.1-8B",
+            quantization_config=bnb_config,
+            device_map="auto",
+            torch_dtype=torch.float16
+        )
 
     def generate_response(self, prompt, max_length=200):
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)

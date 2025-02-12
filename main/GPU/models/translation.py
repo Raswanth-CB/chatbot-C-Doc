@@ -4,8 +4,8 @@ from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 class IndicTranslator:
     def __init__(self):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = AutoModelForSeq2SeqLM.from_pretrained("ai4bharat/indictrans2-en-indic-1B").to(self.device)
-        self.tokenizer = AutoTokenizer.from_pretrained("ai4bharat/indictrans2-en-indic-1B")
+        self.model = AutoModelForSeq2SeqLM.from_pretrained("model/indictrans2-en-indic-1B").to(self.device)
+        self.tokenizer = AutoTokenizer.from_pretrained("model/indictrans2-en-indic-1B")
 
     def translate(self, text, src_lang, tgt_lang):
         self.tokenizer.src_lang = src_lang
