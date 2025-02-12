@@ -11,7 +11,6 @@ Complete project work flow
 
 
 # Data flow 
-```mermaid
     [Start]
     │
     ├── Input Handling
