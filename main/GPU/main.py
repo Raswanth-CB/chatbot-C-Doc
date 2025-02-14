@@ -10,15 +10,18 @@ from models.llama import LlamaModel
 from utils.language_detect import detect_language
 from utils.config import get_language_code
 
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler(f'pipeline_log_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log'),
+        logging.FileHandler(os.path.join("/home/miphi/raswanth/chatbot-C-Doc/main/GPU/log", 
+                                       f'pipeline_log_{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.log')),
         logging.StreamHandler()
     ]
 )
+
 logger = logging.getLogger(__name__)
 
 class MultilingualChatbot:
@@ -34,10 +37,17 @@ class MultilingualChatbot:
         logger.info(f"Using primary device: {self.device}")
 
         # Initialize models with automatic device placement
-        self.asr_model = WhisperASR().to(self.device)
-        self.translator = IndicTranslator().to(self.device)
-        self.tts_model = IndicTTS().to(self.device)
-        self.llama_model = LlamaModel().to(self.device)
+        # self.asr_model = WhisperASR().to(self.device)
+        # self.translator = IndicTranslator().to(self.device)
+        # self.tts_model = IndicTTS().to(self.device)
+        # self.llama_model = LlamaModel().to(self.device)
+        
+        # Initialize models (REMOVE .to() calls)
+        self.asr_model = WhisperASR()  # Fixed
+        self.translator = IndicTranslator()  # Fixed
+        self.tts_model = IndicTTS()  # Fixed
+        self.llama_model = LlamaModel()  # Fixed
+
 
         self.conversation_history = []
         logger.info("All models initialized successfully")
@@ -82,17 +92,36 @@ class MultilingualChatbot:
             "user": text,
             "assistant": final_text
         })
+         # Generate output
+        timestamp = datetime.now().strftime("%Y%m%d_%H-%M-%S")
+        output_dir = "/home/miphi/raswanth/chatbot-C-Doc/main/GPU/log/output"
+        log_dir = "/home/miphi/raswanth/chatbot-C-Doc/main/GPU/log"
+        
+        os.makedirs(output_dir, exist_ok=True)
+        os.makedirs(log_dir, exist_ok=True)
 
-        # Generate output
         if output_type == "audio":
+            audio_filename = os.path.join(output_dir, f"output_{timestamp}.wav")
             audio = self.tts_model.synthesize(final_text, output_lang)
-            sf.write("output.wav", audio, 16000)
-            return "Audio response saved to output.wav"
+            sf.write(audio_filename, audio, 16000)
+            return f"Audio response saved to {audio_filename}"
         elif output_type == "both":
+            audio_filename = os.path.join(output_dir, f"output_{timestamp}.wav")
             audio = self.tts_model.synthesize(final_text, output_lang)
-            sf.write("output.wav", audio, 16000)
-            return final_text, "output.wav"
+            sf.write(audio_filename, audio, 16000)
+            return final_text, audio_filename
         return final_text
+    
+        # # Generate output
+        # if output_type == "audio":
+        #     audio = self.tts_model.synthesize(final_text, output_lang)
+        #     sf.write("output.wav", audio, 16000)
+        #     return "Audio response saved to output.wav"
+        # elif output_type == "both":
+        #     audio = self.tts_model.synthesize(final_text, output_lang)
+        #     sf.write("output.wav", audio, 16000)
+        #     return final_text, "output.wav"
+        # return final_text
 
     def _prepare_prompt(self, english_text):
         prompt = "You are a helpful multilingual assistant. Keep responses concise.\n\n"
