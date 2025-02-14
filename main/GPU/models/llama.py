@@ -17,9 +17,9 @@ class LlamaModel:
             bnb_4bit_compute_dtype=torch.float16
         )
         
-        self.tokenizer = AutoTokenizer.from_pretrained("model/Llama-3.1-8B")
+        self.tokenizer = AutoTokenizer.from_pretrained("/home/miphi/raswanth/model/Llama-3.1-8B")
         self.model = AutoModelForCausalLM.from_pretrained(
-            "model/Llama-3.1-8B",
+            "/home/miphi/raswanth/model/Llama-3.1-8B",
             quantization_config=bnb_config,
             device_map="auto",
             torch_dtype=torch.float16
@@ -38,3 +38,4 @@ class LlamaModel:
             )
         
         return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+    

@@ -6,9 +6,9 @@ from transformers import WhisperProcessor, WhisperForConditionalGeneration
 class WhisperASR:
     def __init__(self):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.processor = WhisperProcessor.from_pretrained("model/whisper-large-v3-turbo")
+        self.processor = WhisperProcessor.from_pretrained("/home/miphi/raswanth/model/whisper-large-v3")
         self.model = WhisperForConditionalGeneration.from_pretrained(
-            "model/whisper-large-v3-turbo"
+            "/home/miphi/raswanth/model/whisper-large-v3"
         ).to(self.device)
         self.model.config.forced_decoder_ids = None
 
